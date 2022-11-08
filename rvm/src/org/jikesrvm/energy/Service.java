@@ -85,8 +85,7 @@ public class Service implements ProfilingTypes, ScalerOptions {
 					}
 				}
 				if (Controller.options.ENABLE_ENERGY_PROFILING) {
-
-					double[] energy = EnergyCheckUtils.getEnergyStats();
+						double[] energy = EnergyCheckUtils.getEnergyStats();
 
 					for (int i = 0; i < EnergyCheckUtils.ENERGY_ENTRY_SIZE; i++) {
 						thread.prevProfile[eventId] = energy[i];
@@ -112,28 +111,29 @@ public class Service implements ProfilingTypes, ScalerOptions {
 				}
 
 				if (Controller.options.ENABLE_ENERGY_PROFILING) {
-					
+	
 					double[] energy = EnergyCheckUtils.getEnergyStats();
-					
+	
 					for (int i = 0; i < EnergyCheckUtils.ENERGY_ENTRY_SIZE; i++) {
 						profileAttrs[eventId] = calculateEnergy(energy[i], thread.prevProfile[eventId]);
 						thread.prevProfile[eventId] = energy[i];
 						eventId++;
 					}
+	
 					//VM.sysWriteln("profile info: " + profileAttrs[2]);
 
 					int ll = profileAttrs.length;
 					boolean discard_sample = profileAttrs[ll-1]<=0;
-
+	
 					int freq = (int) Controller.options.FREQUENCY_TO_BE_PRINTED;
 					if(!discard_sample) {
-
+		
 						SysCall.sysCall.add_log_entry(profileAttrs,cmid,0,freq);
 					}
-
-
+	
+ 
 				}
-			}
+			} 
 		  }
 
 		  public static double calculateEnergy(double end, double start) {

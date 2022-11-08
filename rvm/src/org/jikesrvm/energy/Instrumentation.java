@@ -174,7 +174,6 @@ public class Instrumentation {
 						// ers.inline(endProfInst, ir);
 					}
 				}
-
 			} else {
 
 				for (int i = 0; i < candidateDvfsMth.length; i++) {
@@ -182,8 +181,9 @@ public class Instrumentation {
 					if(freq==19) {
 						String[] kenan_fields = candidateDvfsMth[i].split(":");
 						candidate = kenan_fields[0];
+						VM.sysWriteln(kenan_fields[1]);
 						scaleFreq = Integer.parseInt(kenan_fields[1]);
-						//VM.sysWriteln(candidate);
+						
 					} else {
 						candidate = candidateDvfsMth[i];
 						scaleFreq=freq;
