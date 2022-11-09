@@ -22,5 +22,5 @@ mv *kenan_energy   $expname
 mv *iteration_times $expname
 mv *iteration_energy $expname
 
-
 python3 vincent_scripts/data_processing.py --function calculate_min --experiment_dir $expname
+
