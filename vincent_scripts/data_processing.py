@@ -13,14 +13,14 @@ import matplotlib.font_manager as fm
 import seaborn as sns;
 import matplotlib.colors as colors
 
-
+benchmarks=["sunflow","avrora","pmd","jython","antlr","bloat","fop","luindex"]
+# benchmarks = ["luindex"]   
 """
 This function takes in the experiment directory for the first stage of profiling  
 outputs a settings file for each benchmark to be consumed in the next step of profiling
 """
 def profiling_generate_settings(experiment_dir, iterations):
     # Benchmarks to process
-    benchmarks=["sunflow","avrora","pmd","jython","antlr","bloat","fop","luindex"]
    
     for bench in benchmarks:
         # Read raw data and add header
@@ -63,7 +63,7 @@ outputs three heatmaps in a subdirectory called heatmaps in the experiment folde
 """
 def generate_heatmaps(exp_dir):
     cmap = colors.LinearSegmentedColormap.from_list("n",["#00FF00","#110000", "#D3D3D3"])
-    benchlist=["sunflow", "avrora","pmd","fop","antlr","luindex", "bloat", "jython"]
+    # benchlist=["sunflow", "avrora","pmd","fop","antlr","luindex", "bloat", "jython"]
     heat_type=["etm_best", "time_best" ,"energy_best"]
 
     sns.set(font_scale=1)
@@ -72,7 +72,7 @@ def generate_heatmaps(exp_dir):
         i=0
         fig,axs = plt.subplots(4, 2,figsize=(16,16))
         axs=axs.flatten()
-        for bench in benchlist:
+        for bench in benchmarks:
                 energy_df=pd.read_csv("{}/ratios/{}_{}.csv".format(exp_dir,bench, htype))
 
                 data = {'Method': np.repeat(range(1,6), 11),
@@ -95,6 +95,57 @@ def generate_heatmaps(exp_dir):
         fig.tight_layout()
         fig.savefig('%s/heatmaps/%s_heat.pdf'  %(exp_dir, htype))
 
+def write_file(p,v):
+    f = open(p, "w")
+    f.truncate()
+    f.write("%f" %(v))
+    f.close()
+
+def read_file(p):
+    with open(p, "r") as myfile:
+        data = float(myfile.readlines()[0].strip())
+        return data
+
+def calculate_baseline_min(exp_dir):
+    # lst=["avrora","pmd","antlr","bloat","fop","luindex"];
+    lst=benchmarks
+    for bench in lst:
+        min_t = 10000000000;
+        min_e = 10000000000;
+        min_edp = 10000000000
+        bestef=-1
+        besttf=-1
+        bestedpf=-1
+        for i in range(1,13):
+            if(i==1):
+                continue
+
+            e=read_file("%s/%s_%d_kenan_energy" %(exp_dir,bench,i))
+            t=read_file("%s/%s_%d_execution_time" %(exp_dir ,bench,i))
+            edp=e*t
+            if(e>0):
+                if(e<min_e):
+                    min_e=e
+                    bestef=i
+
+                if(t<min_t):
+                    min_t=t;
+                    besttf=i
+
+                if(edp<min_edp):
+                    min_edp=edp;
+                    bestedpf=i
+            else:
+                print("%s freq %d needs a rerun" % (bench, i))
+
+        write_file("%s/%s_best_t" %(exp_dir,bench),min_t)
+        write_file("%s/%s_best_e" % (exp_dir,bench),min_e)
+        write_file("%s/%s_best_edp" % (exp_dir,bench), min_edp)
+
+        write_file("%s/%s_best_t_f" %(exp_dir,bench),besttf)
+        write_file("%s/%s_best_e_f" % (exp_dir,bench),bestef)
+        write_file("%s/%s_best_edp_f" % (exp_dir,bench), bestedpf)
+
 
 def main():
     # argparse
@@ -102,13 +153,19 @@ def main():
     parser.add_argument("--function", help="what function to execute", type=str, required=True)
     parser.add_argument("--experiment_dir", help="directory of experiment", type=str, required=True)
     parser.add_argument("--iterations", help="number of iterations per experiment", type=int, required=True)
+    # parser.add_argument("--iterations", help="number of iterations per experiment", type=int, required=True)
     
     args =  parser.parse_args()
+    
     if args.function == 'profiling_generate_settings':
-        profiling_generate_settings(args.experiment_dir)
+        profiling_generate_settings(args.experiment_dir, args.iterations)
         print(args.experiment_dir) 
     elif args.function == 'generate_heatmaps':
         generate_heatmaps(args.experiment_dir)
-   
+    elif args.function == 'calculate_min':
+        calculate_baseline_min(args.experiment_dir)
+    
+    
+    
 if __name__ == '__main__':
     main()

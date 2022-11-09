@@ -35,8 +35,8 @@ echo "Reading $bench Settings : $benchsettings"
 while IFS= read -r line
 do
    
-    mname=$(echo $line | cut -d';' -f 4)
-    iters=$(echo $line | cut -d';' -f 3)
+    mname=$(echo $line | cut -d',' -f 4)
+    iters=$(echo $line | cut -d',' -f 3)
     
     bestenergy="${baseline}/${bench}_best_e"
     bestenergy=$(head -1 "$bestenergy")
@@ -57,9 +57,9 @@ do
     # the reason this is 2 is because we decided to remove the first frequency
     for i in {2..12}
     do
-    eng="$exp/$bench/kenan_energy_${bench}_${i}_${filepart}"
+    eng="${exp}_dvfs/$bench/kenan_energy_${bench}_${i}_${filepart}"
     eng=$(head -1 "$eng")
-    time="$exp/$bench/execution_time_${bench}_${i}_${filepart}"
+    time="${exp}_dvfs/$bench/execution_time_${bench}_${i}_${filepart}"
     time=$(head -1 "$time")
 
     bestengr="scale=10;$eng / $bestenergy"
