@@ -156,9 +156,6 @@ public final class ExpandRuntimeServices extends CompilerPhase {
       //      instru.instrumentIO();	
                       instru.perform();	
     }	
-    // TODO: Kenan - We need to have another argument to enable/disable method level DVFS	
-    org.jikesrvm.energy.Instrumentation instru = new org.jikesrvm.energy.Instrumentation(ir);	
-    instru.perform();
 
     for (Instruction inst = ir.firstInstructionInCodeOrder(); inst != null; inst = next) {
       next = inst.nextInstructionInCodeOrder();
